@@ -1,0 +1,28 @@
+version: '{branch}-{build}'
+image: Visual Studio 2015
+skip_non_tags: false
+platform:
+- x86
+- x64
+init:
+- cmd: IF %APPVEYOR_REPO_TAG%==true appveyor UpdateBuild -Version %APPVEYOR_REPO_TAG_NAME%-%APPVEYOR_BUILD_NUMBER%
+before_build:
+- cmd: >-
+    appveyor DownloadFile http://ltr-data.se/files/source.7z
+
+    7z x *.7z
+build_script:
+- cmd: build.bat
+after_build:
+- cmd: 7z a ltrdata-%Platform%.zip *.exe
+artifacts:
+- path: '*.zip'
+  name: ltrdata
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  auth_token:
+    secure: BnbjcHJR8M7TB5zoow2QT3wsQMENgvdNTMUe7J1n/kxOGvlZUROXcKbKva/tDYb8
+  artifact: /.*\.zip/
+  on:
+    APPVEYOR_REPO_TAG: true
