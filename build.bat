@@ -12,6 +12,9 @@ SET Include=%Include%;%CRT_INC_PATH%
 
 SET Path=%CD%;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin;%Path%
 
+SET LTRDATA_VERSION=%APPVEYOR_REPO_COMMIT%
+IF %APPVEYOR_REPO_TAG%==true SET LTRDATA_VERSION=%APPVEYOR_REPO_TAG_NAME%
+
 CD winstrct
 %BUILD_MAKE_PROGRAM%
 MOVE /Y *.lib ..\win32\lib
@@ -24,6 +27,9 @@ FOR %%I IN (
 "/Ox	/O1 /GL /DNDEBUG /GS-"
 "/debug	 "
 ) DO FOR /F "TOKENS=1,* DELIMS=	" %%J IN (%%I) DO %SED% "s@%%J@%%K@" -i Makefile
+
+%SED% "s/ [^ ]\+rawcopy\.res//" -i Makefile
+ECHO #define RAWCOPY_VERSION "%LTRDATA_VERSION%"> ..\rawcopy\rawcopy.rc.h
 
 FOR /F "DELIMS=" %%I IN ('TYPE ..\..\filelist.txt') DO %BUILD_MAKE_PROGRAM% %%I CPU=%CPU%
 

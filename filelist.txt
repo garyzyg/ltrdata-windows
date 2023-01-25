@@ -1,4 +1,5 @@
 msgbox.exe
 msgboxw.exe
+rawcopy.exe
 runwait.exe
 runwaitw.exe
